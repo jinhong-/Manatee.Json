@@ -60,5 +60,28 @@ namespace Manatee.Json.Internal
 				   value is long ||
 				   value is ulong;
 		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsNumber(this Type type)
+		{
+			return IsFloat(type) ||
+			       IsInteger(type);
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsFloat(this Type type)
+		{
+			return type == typeof(double) ||
+			       type == typeof(float);
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsInteger(this Type type)
+		{
+			return type == typeof(int) ||
+			       type == typeof(uint) ||
+			       type == typeof(short) ||
+			       type == typeof(ushort) ||
+			       type == typeof(byte) ||
+			       type == typeof(long) ||
+			       type == typeof(ulong);
+		}
 	}
 }

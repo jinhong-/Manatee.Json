@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Manatee.Json.Serialization;
 using Manatee.Json.Internal;
+using Manatee.Json.Schema.Generation;
 using Manatee.Json.Schema.Validators;
+using Manatee.Json.Serialization.Internal.Serializers;
 
 namespace Manatee.Json.Schema
 {
@@ -470,6 +472,17 @@ namespace Manatee.Json.Schema
 			var results = validators.Select(v => v.Validate(this, json, jValue)).ToList();
 			return new SchemaValidationResults(results);
 		}
+
+		/// <summary>
+		/// Generates a draft 07 schema for a .Net type.
+		/// </summary>
+		/// <typeparam name="T">The type.</typeparam>
+		/// <returns>A <see cref="JsonSchema07"/> instance that validates objects of type <typeparamref name="T"/></returns>
+		public static object GenerateFor<T>(JsonSerializer serializer)
+		{
+			return SchemaGenerator.Generate<T>(() => new JsonSchema07(), serializer);
+		}
+
 
 		/// <summary>
 		/// Builds an object from a <see cref="JsonValue"/>.

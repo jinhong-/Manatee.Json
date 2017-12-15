@@ -128,6 +128,7 @@
     <Compile Include="Path\ToStringTest.cs" />
     <Compile Include="JsonOptionsTest.cs" />
     <Compile Include="Schema\ExamplesSchemaTest.cs" />
+    <Compile Include="Schema\GenerationTest.cs" />
     <Compile Include="Schema\JsonSchemaTypeTest.cs" />
     <Compile Include="Schema\SchemaValidationResultsExtensions.cs" />
     <Compile Include="Schema\SelfValidationTest.cs" />
@@ -180,6 +181,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Compile Include="Serialization\SchemaAttributeTests.cs" />
+    <Compile Include="Test References\SchemaGenerationTarget.cs" />
     <Compile Include="Transform\ClientTest.cs" />
     <Compile Include="Path\GoessnerExamplesTest.cs" />
     <Compile Include="Schema\AllOfSchemaTest.cs" />
