@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Manatee.Json.Internal;
 
@@ -9,141 +9,131 @@ namespace Manatee.Json.Schema
 	/// <summary>
 	/// Defines various string formatting types used for StringSchema validation.
 	/// </summary>
-	public class StringFormat
+	public enum StringFormat
 	{
+		NotDefined,
 		/// <summary>
 		/// Defines a date/time format via <see cref="DateTime.TryParse(string, out DateTime)"/>
 		/// </summary>
-		public static readonly StringFormat DateTime = new StringFormat("date-time", s =>
-			{
-				DateTime date;
-				return System.DateTime.TryParse(s, out date);
-			})
-			{
-				SupportedBy = new[]{typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07)}
-			};
+		DateTime,
 		/// <summary>
 		/// Defines an email address format.
 		/// </summary>
 		/// <remarks>
 		/// From http://www.regular-expressions.info/email.html
 		/// </remarks>
-		public static readonly StringFormat Email = new StringFormat("email", "^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])$")
-			{
-				SupportedBy = new[]{typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07) }
-			};
+		Email,
 		// from [lost the link, sorry]
 		/// <summary>
 		/// Defines a host name format.
 		/// </summary>
-		public static readonly StringFormat HostName = new StringFormat("hostname", "^(?!.{255,})([a-zA-Z0-9-]{0,63}\\.)*([a-zA-Z0-9-]{0,63})$")
-			{
-				SupportedBy = new[]{typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07) }
-			};
+		HostName,
 		// from [lost the link, sorry]
 		/// <summary>
 		/// Defines an IPV4 address format.
 		/// </summary>
-		public static readonly StringFormat Ipv4 = new StringFormat("ipv4", "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
-			{
-				SupportedBy = new[]{typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07) }
-			};
+		Ipv4,
 		// from [lost the link, sorry]
 		/// <summary>
 		/// Defines an IPV6 format.
 		/// </summary>
-		public static readonly StringFormat Ipv6 = new StringFormat("ipv6", "^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]).){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]).){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$")
-			{
-				SupportedBy = new[]{typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07) }
-			};
+		Ipv6,
 		/// <summary>
 		/// Defines a regular expression format.
 		/// </summary>
-		public static readonly StringFormat Regex = new StringFormat("regex", null, true)
-			{
-				SupportedBy = new[]{typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07) }
-			};
+		Regex,
 		/// <summary>
 		/// Defines a URI format via <see cref="System.Uri.IsWellFormedUriString(string, UriKind)"/>.
 		/// </summary>
 		/// <remarks>For draft-06 schema, only use this for absolute URIs.</remarks>
-		public static readonly StringFormat Uri = new StringFormat("uri", s => System.Uri.IsWellFormedUriString(s, UriKind.RelativeOrAbsolute))
-			{
-				SupportedBy = new[]{typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07) }
-			};
+		Uri,
 		/// <summary>
-		/// Defines a URI format via <see cref="System.Uri.IsWellFormedUriString(string, UriKind)"/>
+		/// Defines a URI format per RFC 3896.
 		/// </summary>
-		public static readonly StringFormat UriReference = new StringFormat("uri-reference", Uri3986.IsValid)
-			{
-				SupportedBy = new[]{typeof(JsonSchema06), typeof(JsonSchema07) }
-			};
+		UriReference
+	}
 
-		private static readonly Dictionary<string, StringFormat> _lookup = new Dictionary<string, StringFormat>
+	internal static class StringFormatValidator
+	{
+		private class StringFormatData
+		{
+			private readonly Regex _validationRule;
+			private readonly Func<string, bool> _validate;
+
+			public string Key { get; }
+			public List<Type> SupportedBy { get; }
+
+			public StringFormatData(string key, Regex regex, params Type[] supportedBy)
+			{
+				Key = key;
+				_validationRule = regex;
+				SupportedBy = supportedBy.ToList();
+			}
+			public StringFormatData(string key, Func<string, bool> validate, params Type[] supportedBy)
+			{
+				_validate = validate;
+				Key = key;
+				SupportedBy = supportedBy.ToList();
+			}
+			public bool Validate(string value)
+			{
+				return _validationRule?.IsMatch(value) ?? _validate == null || _validate(value);
+			}
+		}
+
+		private static readonly Dictionary<StringFormat, StringFormatData> _formats =
+			new Dictionary<StringFormat, StringFormatData>
 				{
-					{DateTime.Key, DateTime},
-					{Email.Key, Email},
-					{HostName.Key, HostName},
-					{Ipv4.Key, Ipv4},
-					{Ipv6.Key, Ipv6},
-					{Regex.Key, Regex},
-					{Uri.Key, Uri},
-					{UriReference.Key, UriReference}
+					[StringFormat.NotDefined] = new StringFormatData(string.Empty, s => true,
+																	 typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07)),
+					[StringFormat.DateTime] = new StringFormatData("date-time", s => DateTime.TryParse(s, out _),
+																   typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07)),
+					[StringFormat.Email] = new StringFormatData("email",
+					                                            new Regex("^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])$"),
+					                                            typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07)),
+					[StringFormat.HostName] = new StringFormatData("hostName",
+					                                               new Regex("^(?!.{255,})([a-zA-Z0-9-]{0,63}\\.)*([a-zA-Z0-9-]{0,63})$"),
+					                                               typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07)),
+					[StringFormat.Ipv4] = new StringFormatData("ipv4",
+					                                           new Regex("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"),
+					                                           typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07)),
+					[StringFormat.Ipv6] = new StringFormatData("ipv6",
+															   new Regex("^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]).){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]).){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$"),
+															   typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07)),
+					[StringFormat.Regex] = new StringFormatData("regex", (Regex) null, typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07)),
+					[StringFormat.Uri] = new StringFormatData("uri", s => Uri.IsWellFormedUriString(s, UriKind.RelativeOrAbsolute),
+					                                          typeof(JsonSchema04), typeof(JsonSchema06), typeof(JsonSchema07)),
+					[StringFormat.UriReference] = new StringFormatData("uri-reference", Uri3986.IsValid,
+					                                                   typeof(JsonSchema06), typeof(JsonSchema07)),
 				};
 
-		private readonly Regex _validationRule;
-		private readonly Func<string, bool> _validate;
-
-		/// <summary>
-		/// A string key which specifies this string format.
-		/// </summary>
-		public string Key { get; }
-		
-		private IList<Type> SupportedBy { get; set; }
-
-		private StringFormat(string key, string regex, bool isCaseSensitive = false)
-		{
-			Key = key;
-			if (regex != null)
-				_validationRule = new Regex(regex, isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
-		}
-		private StringFormat(string key, Func<string, bool> validate)
-		{
-			_validate = validate;
-			Key = key;
-		}
-
-		/// <summary>
-		/// Validates a value to the specified format.
-		/// </summary>
-		/// <param name="value">The value to validate.</param>
-		/// <returns>True if the value is valid, otherwise false.</returns>
-		public bool Validate(string value)
-		{
-			if (_validationRule == null)
-			{
-				return _validate == null || _validate(value);
-			}
-			return _validationRule.IsMatch(value);
-		}
-
-		/// <summary>
-		/// Gets a <see cref="StringFormat"/> object based on a format key.
-		/// </summary>
-		/// <param name="formatKey">The predefined key for the format.</param>
-		/// <returns>A <see cref="StringFormat"/> object, or null if none exists for the key.</returns>
-		public static StringFormat GetFormat(string formatKey)
-		{
-			return formatKey != null && _lookup.ContainsKey(formatKey)
-				       ? _lookup[formatKey]
-				       : null;
-		}
-
-		internal void ValidateForDraft<T>()
+		internal static bool Validate<T>(StringFormat format, string value)
 			where T : IJsonSchema
 		{
-			if (!((IList) SupportedBy).Contains(typeof(T)))
-				throw new InvalidOperationException($"Format '{Key}' is not supported by {typeof(T).Name}");
+			var data = _formats[format];
+			if (!data.SupportedBy.Contains(typeof(T)))
+				throw new InvalidOperationException($"Format '{data.Key}' is not supported by {typeof(T).Name}");
+
+			return data.Validate(value);
+		}
+
+		internal static void ValidateForDraft<T>(StringFormat format)
+			where T : IJsonSchema
+		{
+			var data = _formats[format];
+			if (!data.SupportedBy.Contains(typeof(T)))
+				throw new InvalidOperationException($"Format '{data.Key}' is not supported by {typeof(T).Name}");
+		}
+
+		internal static string GetString(StringFormat format)
+		{
+			var data = _formats[format];
+			return data.Key;
+		}
+
+		internal static StringFormat GetFormat(string key)
+		{
+			return _formats.FirstOrDefault(kvp => kvp.Value.Key == key).Key;
 		}
 	}
 }

@@ -228,7 +228,7 @@ namespace Manatee.Json.Schema
 			get { return _id; }
 			set
 			{
-				if (!string.IsNullOrWhiteSpace(value) && !StringFormat.UriReference.Validate(value))
+				if (!string.IsNullOrWhiteSpace(value) && !StringFormatValidator.Validate<JsonSchema07>(StringFormat.UriReference, value))
 					throw new ArgumentOutOfRangeException(nameof(Id), "'$id' property must be a well-formed URI.");
 				_id = value;
 			}
@@ -244,7 +244,7 @@ namespace Manatee.Json.Schema
 			get { return _schema; }
 			set
 			{
-				if (!string.IsNullOrWhiteSpace(value) && !StringFormat.Uri.Validate(value))
+				if (!string.IsNullOrWhiteSpace(value) && !StringFormatValidator.Validate<JsonSchema07>(StringFormat.Uri, value))
 					throw new ArgumentOutOfRangeException(nameof(Schema), "'$schema' property must be a well-formed URI.");
 				_schema = value;
 			}
@@ -396,7 +396,7 @@ namespace Manatee.Json.Schema
 			get { return _format; }
 			set
 			{
-				value?.ValidateForDraft<JsonSchema07>();
+				StringFormatValidator.ValidateForDraft<JsonSchema07>(value);
 				_format = value;
 			}
 		}
@@ -478,9 +478,12 @@ namespace Manatee.Json.Schema
 		/// </summary>
 		/// <typeparam name="T">The type.</typeparam>
 		/// <returns>A <see cref="JsonSchema07"/> instance that validates objects of type <typeparamref name="T"/></returns>
-		public static object GenerateFor<T>(JsonSerializer serializer)
+		public static JsonSchema07 GenerateFor<T>(JsonSerializer serializer)
 		{
-			return SchemaGenerator.Generate<T>(() => new JsonSchema07(), serializer);
+			var schema = new SchemaGenerator().Generate<T>(serializer);
+			return Equals(schema, Empty)
+				       ? True
+				       : schema;
 		}
 
 
@@ -586,8 +589,7 @@ namespace Manatee.Json.Schema
 				OneOf = obj["oneOf"].Array.Select(_ReadSchema);
 			if (obj.ContainsKey("not"))
 				Not = _ReadSchema(obj["not"]);
-			var formatKey = obj.TryGetString("format");
-			Format = StringFormat.GetFormat(formatKey);
+			Format = StringFormatValidator.GetFormat(obj.TryGetString("format"));
 			ContentMediaType = obj.TryGetString("contentMediaType");
 			var options = serializer.Options;
 			var newOptions = new JsonSerializerOptions(options) {CaseSensitiveDeserialization = false};
@@ -679,8 +681,8 @@ namespace Manatee.Json.Schema
 				array.Array.EqualityStandard = ArrayEquality.ContentsEqual;
 				json["enum"] = Enum.ToJson(serializer);
 			}
-			if (Format != null)
-				json["format"] = Format.Key;
+			if (Format != StringFormat.NotDefined)
+				json["format"] = StringFormatValidator.GetString(Format);
 			if (ContentMediaType != null)
 				json["contentMediaType"] = ContentMediaType;
 			if (ContentEncoding != null)
@@ -823,7 +825,7 @@ namespace Manatee.Json.Schema
 				hashCode = (hashCode * 397) ^ (Dependencies?.GetCollectionHashCode() ?? 0);
 				hashCode = (hashCode * 397) ^ (Const?.GetHashCode() ?? 0);
 				hashCode = (hashCode * 397) ^ (Enum?.GetCollectionHashCode() ?? 0);
-				hashCode = (hashCode * 397) ^ (Format?.GetHashCode() ?? 0);
+				hashCode = (hashCode * 397) ^ Format.GetHashCode();
 				hashCode = (hashCode * 397) ^ (ContentMediaType?.GetHashCode() ?? 0);
 				hashCode = (hashCode * 397) ^ (ContentEncoding?.GetHashCode() ?? 0);
 				hashCode = (hashCode * 397) ^ (If?.GetHashCode() ?? 0);

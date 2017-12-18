@@ -7,13 +7,14 @@
 		
 		public bool Applies(T schema, JsonValue json)
 		{
-			return GetFormat(schema) != null && JsonSchemaOptions.ValidateFormat &&
+			return GetFormat(schema) != StringFormat.NotDefined && JsonSchemaOptions.ValidateFormat &&
 			       json.Type == JsonValueType.String;
 		}
 		public SchemaValidationResults Validate(T schema, JsonValue json, JsonValue root)
 		{
-			if (!GetFormat(schema).Validate(json.String))
-				return new SchemaValidationResults(string.Empty, $"Value [{json.String}] is not in an acceptable {GetFormat(schema).Key} format.");
+			var format = GetFormat(schema);
+			if (!StringFormatValidator.Validate<T>(format, json.String))
+				return new SchemaValidationResults(string.Empty, $"Value [{json.String}] is not in an acceptable {format} format.");
 			return new SchemaValidationResults();
 		}
 	}

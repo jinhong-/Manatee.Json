@@ -231,7 +231,7 @@ namespace Manatee.Json.Schema
 			get { return _id; }
 			set
 			{
-				if (!string.IsNullOrWhiteSpace(value) && !StringFormat.Uri.Validate(value))
+				if (!string.IsNullOrWhiteSpace(value) && !StringFormatValidator.Validate<JsonSchema04>(StringFormat.Uri, value))
 					throw new ArgumentOutOfRangeException(nameof(Id), "'id' property must be a well-formed URI.");
 				_id = value;
 			}
@@ -247,7 +247,7 @@ namespace Manatee.Json.Schema
 			get { return _schema; }
 			set
 			{
-				if (!string.IsNullOrWhiteSpace(value) && !StringFormat.Uri.Validate(value))
+				if (!string.IsNullOrWhiteSpace(value) && !StringFormatValidator.Validate<JsonSchema04>(StringFormat.Uri, value))
 					throw new ArgumentOutOfRangeException(nameof(Schema), "'$schema' property must be a well-formed URI.");
 				_schema = value;
 			}
@@ -393,7 +393,7 @@ namespace Manatee.Json.Schema
 			get { return _format; }
 			set
 			{
-				value?.ValidateForDraft<JsonSchema04>();
+				StringFormatValidator.ValidateForDraft<JsonSchema04>(value);
 				_format = value;
 			}
 		}
@@ -514,8 +514,7 @@ namespace Manatee.Json.Schema
 				OneOf = obj["oneOf"].Array.Select(_ReadSchema);
 			if (obj.ContainsKey("not"))
 				Not = _ReadSchema(obj["not"]);
-			var formatKey = obj.TryGetString("format");
-			Format = StringFormat.GetFormat(formatKey);
+			Format = StringFormatValidator.GetFormat(obj.TryGetString("format"));
 			var details = obj.Where(kvp => !_definedProperties.Contains(kvp.Key)).ToJson();
 			if (details.Any())
 				ExtraneousDetails = details;
@@ -607,7 +606,8 @@ namespace Manatee.Json.Schema
 				json["oneOf"] = array;
 			}
 			if (Not != null) json["not"] = Not.ToJson(serializer);
-			if (Format != null) json["format"] = Format.Key;
+			if (Format != StringFormat.NotDefined)
+				json["format"] = StringFormatValidator.GetString(Format);
 			if (ExtraneousDetails != null)
 			{
 				foreach (var kvp in ExtraneousDetails.Where(kvp => !_definedProperties.Contains(kvp.Key)))
@@ -713,7 +713,7 @@ namespace Manatee.Json.Schema
 				hashCode = (hashCode*397) ^ (AnyOf?.GetCollectionHashCode() ?? 0);
 				hashCode = (hashCode*397) ^ (OneOf?.GetCollectionHashCode() ?? 0);
 				hashCode = (hashCode*397) ^ (Not?.GetHashCode() ?? 0);
-				hashCode = (hashCode*397) ^ (Format?.GetHashCode() ?? 0);
+				hashCode = (hashCode*397) ^ Format.GetHashCode();
 				hashCode = (hashCode*397) ^ (Required?.GetCollectionHashCode() ?? 0);
 				return hashCode;
 			}

@@ -9,95 +9,103 @@ using Manatee.Json.Serialization.Internal.Serializers;
 
 namespace Manatee.Json.Schema.Generation
 {
-	internal static class SchemaGenerator
+	internal class SchemaGenerator
 	{
-		public static IJsonSchema Generate<T>(Func<IJsonSchema> getSchema, JsonSerializer serializer, Dictionary<IJsonSchema, string> definitions = null)
+		private bool _generateProperties = true;
+
+		public JsonSchema07 Generate<T>(JsonSerializer serializer)
 		{
-			var properties = ReflectionCache.GetMembers(typeof(T), PropertySelectionStrategy.ReadWriteOnly, false)
+			return Generate(typeof(T), serializer);
+		}
+
+		public JsonSchema07 Generate(Type type, JsonSerializer serializer)
+		{
+			var properties = ReflectionCache.GetMembers(type, PropertySelectionStrategy.ReadWriteOnly, false)
 			                                .Select(s => s.MemberInfo)
 			                                .OfType<PropertyInfo>()
 			                                .ToList();
-			definitions = definitions ?? new Dictionary<IJsonSchema, string>();
-			var schema = getSchema();
+			var schema = new JsonSchema07();
+			_AssignType(schema, type, serializer);
 			var schemaProperties = new Dictionary<string, IJsonSchema>();
-			foreach (var propertyInfo in properties)
+			var required = new List<string>();
+			if (_generateProperties)
 			{
-				var propertySchema = getSchema();
-				var attributes = propertyInfo.GetCustomAttributes().OfType<ISchemaGenerationAttribute>().ToList();
-				foreach (var attribute in attributes)
+				foreach (var propertyInfo in properties)
 				{
-					attribute.Update(propertySchema);
+					var propertySchema = new SchemaGenerator().Generate(propertyInfo.PropertyType, serializer);
+					var attributes = propertyInfo.GetCustomAttributes()
+					                             .OfType<ISchemaGenerationAttribute>()
+					                             .ToList();
+					JsonSchema07 schemaToUpdate;
+					switch (propertySchema.Type)
+					{
+						case JsonSchemaType.Array:
+							schemaToUpdate = (JsonSchema07) propertySchema.Items;
+							break;
+						case JsonSchemaType.Object:
+							schemaToUpdate = (JsonSchema07) propertySchema.AdditionalProperties;
+							break;
+						default:
+							schemaToUpdate = propertySchema;
+							break;
+					}
+					foreach (var attribute in attributes)
+					{
+						attribute.Update(schemaToUpdate);
+					}
+					var propertyName = serializer.Options.SerializationNameTransform(propertyInfo.Name);
+					schemaProperties[propertyName] = propertySchema;
+					if (propertyInfo.GetCustomAttribute<RequiredAttribute>() != null)
+						required.Add(propertyName);
 				}
-				_AssignType(propertySchema, propertyInfo.PropertyType);
-				var propertyName = serializer.Options.SerializationNameTransform(propertyInfo.Name);
-				schemaProperties[propertyName] = propertySchema;
 			}
-			_AssignProperties(schema, schemaProperties);
-			return schema;
+			if (schemaProperties.Count != 0)
+				schema.Properties = schemaProperties;
+			if (required.Count != 0)
+				schema.Required = required;
+			return Equals(schema, JsonSchema07.Empty)
+				       ? JsonSchema07.True
+				       : schema;
 		}
 
-		private static JsonSchemaType _DetermineType(Type propertyType)
+		private void _AssignType(JsonSchema07 schema, Type type, JsonSerializer serializer)
 		{
-			var typeInfo = propertyType.GetTypeInfo();
+			var typeInfo = type.GetTypeInfo();
 
-			if (typeof(IDictionary).GetTypeInfo().IsAssignableFrom(typeInfo) &&
-			    typeInfo.IsGenericType &&
+			if (typeInfo.IsGenericType &&
+			    typeInfo.GetGenericTypeDefinition() == typeof(Dictionary<,>) &&
 			    typeInfo.GenericTypeArguments[0] == typeof(string))
-				return JsonSchemaType.Object;
-
-			if (propertyType == typeof(string))
-				return JsonSchemaType.String;
-
-			if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(typeInfo))
-				return JsonSchemaType.Array;
-
-			if (propertyType.IsFloat())
-				return JsonSchemaType.Number;
-
-			if (propertyType.IsInteger())
-				return JsonSchemaType.Integer;
-
-			if (propertyType == typeof(bool))
-				return JsonSchemaType.Boolean;
-
-			if (typeInfo.IsEnum)
-				return JsonSchemaType.NotDefined;
-
-			return JsonSchemaType.Object;
-		}
-
-		private static void _AssignType(IJsonSchema schema, Type propertyType)
-		{
-			var type = _DetermineType(propertyType);
-
-			switch (schema)
 			{
-				case JsonSchema04 schema04:
-					schema04.Type = type;
-					break;
-				case JsonSchema06 schema06:
-					schema06.Type = type;
-					break;
-				case JsonSchema07 schema07:
-					schema07.Type = type;
-					break;
+				schema.Type = JsonSchemaType.Object;
+				schema.AdditionalProperties = new SchemaGenerator().Generate(typeInfo.GenericTypeArguments[1], serializer);
+				_generateProperties = false;
 			}
-		}
-
-		private static void _AssignProperties(IJsonSchema schema, Dictionary<string, IJsonSchema> properties)
-		{
-			switch (schema)
+			else if (type == typeof(string))
+				schema.Type = JsonSchemaType.String;
+			else if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(typeInfo))
 			{
-				case JsonSchema04 schema04:
-					schema04.Properties = properties;
-					break;
-				case JsonSchema06 schema06:
-					schema06.Properties = properties;
-					break;
-				case JsonSchema07 schema07:
-					schema07.Properties = properties;
-					break;
+				schema.Type = JsonSchemaType.Array;
+				if (typeInfo.IsGenericType &&
+				    typeInfo.GetGenericTypeDefinition() == typeof(List<>))
+				{
+					schema.Items = new SchemaGenerator().Generate(typeInfo.GenericTypeArguments[0], serializer);
+					_generateProperties = false;
+				}
 			}
+			else if (type.IsFloat())
+				schema.Type = JsonSchemaType.Number;
+			else if (type.IsInteger())
+				schema.Type = JsonSchemaType.Integer;
+			else if (type == typeof(bool))
+				schema.Type = JsonSchemaType.Boolean;
+			else if (typeInfo.IsEnum)
+			{
+				schema.Enum = Enum.GetValues(type)
+				                  .Cast<object>()
+				                  .Select(v => new EnumSchemaValue(v.ToString()))
+				                  .ToList();
+			}
+			else schema.Type = JsonSchemaType.Object;
 		}
 	}
 }

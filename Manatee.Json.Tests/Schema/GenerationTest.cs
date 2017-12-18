@@ -16,16 +16,7 @@ namespace Manatee.Json.Tests.Schema
 				{
 					Definitions = new Dictionary<string, IJsonSchema>
 						{
-							["TestEnum"] = new JsonSchema07
-								{
-									Enum = new List<EnumSchemaValue>
-										{
-											"None",
-											"BasicEnumValue",
-											"enum_value_with_description"
-										}
-								},
-							["FlagsEnum"] = new JsonSchema07
+							["EnumSchemaValue"] = new JsonSchema07
 								{
 									Enum = new List<EnumSchemaValue>
 										{
@@ -59,8 +50,8 @@ namespace Manatee.Json.Tests.Schema
 								{
 									Type = JsonSchemaType.Boolean
 								},
-							["EnumProp"] = new JsonSchemaReference("#/Definitions/TestEnum", typeof(JsonSchema07)),
-							["FlagsEnumProp"] = new JsonSchemaReference("#/Definitions/FlagsEnum", typeof(JsonSchema07)),
+							["EnumProp"] = new JsonSchemaReference("#/Definitions/EnumSchemaValue", typeof(JsonSchema07)),
+							["FlagsEnumProp"] = new JsonSchemaReference("#/Definitions/EnumSchemaValue", typeof(JsonSchema07)),
 							["MappedProp"] = new JsonSchema07
 								{
 									Type = JsonSchemaType.Integer
@@ -70,7 +61,8 @@ namespace Manatee.Json.Tests.Schema
 									Type = JsonSchemaType.Array,
 									Items = new JsonSchema07
 										{
-											Type = JsonSchemaType.Integer
+											Type = JsonSchemaType.Integer,
+											Minimum = 10
 										}
 								},
 							["ReadOnlyDictionaryProp"] = new JsonSchema07
@@ -78,7 +70,8 @@ namespace Manatee.Json.Tests.Schema
 									Type = JsonSchemaType.Object,
 									AdditionalProperties = new JsonSchema07
 										{
-											Type = JsonSchemaType.Integer
+											Type = JsonSchemaType.String,
+											MaxLength = 10
 										}
 								},
 							["Email"] = new JsonSchema07
