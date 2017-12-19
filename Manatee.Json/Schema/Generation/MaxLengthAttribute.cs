@@ -3,11 +3,11 @@
 namespace Manatee.Json.Schema.Generation
 {
 	[AttributeUsage(AttributeTargets.Property)]
-	public class MinLengthAttribute : Attribute, ISchemaGenerationAttribute
+	public class MaxLengthAttribute : Attribute, ISchemaGenerationAttribute
 	{
 		private readonly uint _value;
 
-		public MinLengthAttribute(uint value)
+		public MaxLengthAttribute(uint value)
 		{
 			_value = value;
 		}
@@ -16,13 +16,13 @@ namespace Manatee.Json.Schema.Generation
 			switch (schema)
 			{
 				case JsonSchema04 schema04:
-					schema04.MinLength = _value;
+					schema04.MaxLength = _value;
 					break;
 				case JsonSchema06 schema06:
-					schema06.MinLength = _value;
+					schema06.MaxLength = _value;
 					break;
 				case JsonSchema07 schema07:
-					schema07.MinLength = _value;
+					schema07.MaxLength = _value;
 					break;
 			}
 		}

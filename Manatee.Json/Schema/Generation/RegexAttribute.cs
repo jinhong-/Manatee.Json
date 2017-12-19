@@ -1,28 +1,30 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Manatee.Json.Schema.Generation
 {
 	[AttributeUsage(AttributeTargets.Property)]
-	public class MinLengthAttribute : Attribute, ISchemaGenerationAttribute
+	public class RegexAttribute : Attribute, ISchemaGenerationAttribute
 	{
-		private readonly uint _value;
+		private readonly string _regex;
 
-		public MinLengthAttribute(uint value)
+		public RegexAttribute([RegexPattern] string regex)
 		{
-			_value = value;
+			_regex = regex;
 		}
+
 		void ISchemaGenerationAttribute.Update(IJsonSchema schema)
 		{
 			switch (schema)
 			{
 				case JsonSchema04 schema04:
-					schema04.MinLength = _value;
+					schema04.Pattern = _regex;
 					break;
 				case JsonSchema06 schema06:
-					schema06.MinLength = _value;
+					schema06.Pattern = _regex;
 					break;
 				case JsonSchema07 schema07:
-					schema07.MinLength = _value;
+					schema07.Pattern = _regex;
 					break;
 			}
 		}
