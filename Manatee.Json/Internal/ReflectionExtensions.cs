@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace Manatee.Json.Internal
 {
@@ -41,6 +42,18 @@ namespace Manatee.Json.Internal
 				type = type.BaseType?.GetTypeInfo();
 			}
 			return properties;
+		}
+		public static string CSharpName(this Type type)
+		{
+			var sb = new StringBuilder();
+			var name = type.Name;
+			if (!type.GetTypeInfo().IsGenericType) return name;
+			sb.Append(name.Substring(0, name.IndexOf('`')));
+			sb.Append("<");
+			sb.Append(string.Join(", ", type.GetTypeInfo().GenericTypeArguments
+			                                .Select(t => t.CSharpName())));
+			sb.Append(">");
+			return sb.ToString();
 		}
 	}
 }

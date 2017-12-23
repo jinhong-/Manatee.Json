@@ -63,10 +63,27 @@ namespace Manatee.Json.Schema.Generation
 				schema.Properties = schemaProperties;
 			if (required.Count != 0)
 				schema.Required = required;
+
+			//var allSchemas = _CollectSchemas(schema);
+
 			return Equals(schema, JsonSchema07.Empty)
 				       ? JsonSchema07.True
 				       : schema;
 		}
+
+		//private Dictionary<JsonSchema07, int> _CollectSchemas(JsonSchema07 schema)
+		//{
+		//	var subschemas = new List<IJsonSchema>();
+		//	if (schema.Items != null)
+		//		subschemas.Add(schema.Items);
+		//	if (schema.AdditionalProperties != null)
+		//		subschemas.Add(schema.AdditionalProperties);
+		//	if (schema.Properties != null)
+		//		subschemas.AddRange(schema.Properties.Values);
+		//	if (schema.Definitions != null)
+		//		subschemas.AddRange(schema.Definitions.Values);
+
+		//}
 
 		private void _AssignType(JsonSchema07 schema, Type type, JsonSerializer serializer)
 		{

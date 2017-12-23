@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Manatee.Json.Schema;
 using Manatee.Json.Serialization;
 using Manatee.Json.Tests.Test_References;
@@ -97,6 +98,54 @@ namespace Manatee.Json.Tests.Schema
 			var actual = JsonSchema07.GenerateFor<SchemaGenerationTarget>(new JsonSerializer());
 
 			Assert.AreEqual(expected, actual);
+		}
+
+		[Test]
+		public void GeneratedSchemaValidatesModel()
+		{
+			var model = new SchemaGenerationTarget
+				{
+					Alphanumeric = "noon23tn4in2",
+					BoolProp = true,
+					DoubleProp = 15.4,
+					Email = "me@you.com",
+					EnumProp = TestEnum.BasicEnumValue,
+					FlagsEnumProp = FlagsEnum.EnumValueWithDescription,
+					IntProp = 25,
+					MappedProp = -6,
+					ReadOnlyDictionaryProp =
+						{
+							["one"] = "1",
+							["two"] = "2"
+						},
+					ReadOnlyListProp =
+						{
+							11,
+							12,
+							13,
+							14
+						},
+					StringProp = "1234567890123",
+					Website = "http://site.com"
+				};
+			var serializer = new JsonSerializer
+				{
+					Options =
+						{
+							EnumSerializationFormat = EnumSerializationFormat.AsName
+						}
+				};
+			var json = serializer.Serialize(model);
+			var schema = JsonSchema07.GenerateFor<SchemaGenerationTarget>(serializer);
+
+			var results = schema.Validate(json);
+
+			foreach (var schemaValidationError in results.Errors)
+			{
+				Console.WriteLine(schemaValidationError);
+			}
+
+			Assert.IsTrue(results.Valid);
 		}
 	}
 }

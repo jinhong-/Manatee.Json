@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Manatee.Json.Internal;
 
-namespace Manatee.Json.Schema
+namespace Manatee.Json.Schema.Validators
 {
 	internal static class StringFormatValidator
 	{
