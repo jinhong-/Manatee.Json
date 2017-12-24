@@ -140,6 +140,8 @@ namespace Manatee.Json.Tests.Schema
 
 			var results = schema.Validate(json);
 
+			Console.WriteLine(schema.ToJson(new JsonSerializer()).ToString());
+			Console.WriteLine();
 			foreach (var schemaValidationError in results.Errors)
 			{
 				Console.WriteLine(schemaValidationError);

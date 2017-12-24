@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Manatee.Json.Internal;
 using Manatee.Json.Serialization;
+using Manatee.Json.Serialization.Internal;
 using Manatee.Json.Serialization.Internal.Serializers;
 
 namespace Manatee.Json.Schema.Generation
@@ -117,10 +118,14 @@ namespace Manatee.Json.Schema.Generation
 				schema.Type = JsonSchemaType.Boolean;
 			else if (typeInfo.IsEnum)
 			{
+				var defaultOption = serializer.Options.EncodeDefaultValues;
+				serializer.Options.EncodeDefaultValues = true;
+				var serializerMethod = SerializerCache.GetSerializeMethod(type);
 				schema.Enum = Enum.GetValues(type)
 				                  .Cast<object>()
-				                  .Select(v => new EnumSchemaValue(v.ToString()))
+				                  .Select(v => new EnumSchemaValue(((JsonValue)serializerMethod.Invoke(serializer, new[]{v})).String))
 				                  .ToList();
+				serializer.Options.EncodeDefaultValues = defaultOption;
 			}
 			else schema.Type = JsonSchemaType.Object;
 		}
