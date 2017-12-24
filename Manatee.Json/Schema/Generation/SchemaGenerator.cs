@@ -112,11 +112,11 @@ namespace Manatee.Json.Schema.Generation
 			}
 			else if (type.IsFloat())
 				schema.Type = JsonSchemaType.Number;
-			else if (type.IsInteger())
+			else if (type.IsInteger() || (typeInfo.IsEnum && serializer.Options.EnumSerializationFormat == EnumSerializationFormat.AsInteger))
 				schema.Type = JsonSchemaType.Integer;
 			else if (type == typeof(bool))
 				schema.Type = JsonSchemaType.Boolean;
-			else if (typeInfo.IsEnum)
+			else if (typeInfo.IsEnum && serializer.Options.EnumSerializationFormat == EnumSerializationFormat.AsName)
 			{
 				var defaultOption = serializer.Options.EncodeDefaultValues;
 				serializer.Options.EncodeDefaultValues = true;

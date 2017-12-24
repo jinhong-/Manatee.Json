@@ -32,5 +32,13 @@ namespace Manatee.Json.Tests.Test_References
 		public string Alphanumeric { get; set; }
 		[Format(StringFormat.Uri)]
 		public string Website { get; set; }
+		public SchemaGenerationTarget Recurse { get; set; }
+		public SchemaGenerationSimpleTarget Simple { get; set; }
+	}
+
+	public class SchemaGenerationSimpleTarget
+	{
+		public int Integer { get; set; }
+		public string String { get; set; }
 	}
 }

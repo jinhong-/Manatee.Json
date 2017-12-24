@@ -29,6 +29,7 @@ namespace Manatee.Json.Serialization.Internal.Serializers
 			}
 			return _BuildFlagsValues(obj, serializer.Options.FlagsEnumSeparator);
 		}
+
 		public T Deserialize<T>(JsonValue json, JsonSerializer serializer)
 		{
 			_EnsureDescriptions<T>();
@@ -51,10 +52,11 @@ namespace Manatee.Json.Serialization.Internal.Serializers
 				if (_descriptions.ContainsKey(type)) return;
 
 				var names = Enum.GetValues(type).Cast<T>();
-				var descriptions = names.Select(n => new Description { Value = n, String = _GetDescription<T>(n.ToString()) }).ToList();
+				var descriptions = names.Select(n => new Description {Value = n, String = _GetDescription<T>(n.ToString())}).ToList();
 				_descriptions.Add(type, descriptions);
 			}
 		}
+
 		private static string _GetDescription<T>(string name)
 		{
 			var type = typeof(T);
@@ -62,6 +64,7 @@ namespace Manatee.Json.Serialization.Internal.Serializers
 			var attributes = memInfo.GetCustomAttributes(typeof(DisplayAttribute), false);
 			return attributes.Any() ? ((DisplayAttribute) attributes.First()).Description : name;
 		}
+
 		private static string _BuildFlagsValues<T>(T obj, string separator)
 		{
 			var descriptions = _descriptions[typeof (T)];

@@ -17,13 +17,30 @@ namespace Manatee.Json.Tests.Schema
 				{
 					Definitions = new Dictionary<string, IJsonSchema>
 						{
-							["EnumSchemaValue"] = new JsonSchema07
+							["Manatee.Json.Tests.Test_References.Object.TestEnum"] = new JsonSchema07
 								{
 									Enum = new List<EnumSchemaValue>
 										{
 											"None",
 											"BasicEnumValue",
 											"enum_value_with_description"
+										}
+								},
+							["Manatee.Json.Tests.Test_References.Object.FlagsEnum"] = new JsonSchema07
+								{
+									Enum = new List<EnumSchemaValue>
+										{
+											"None",
+											"BasicEnumValue",
+											"enum_value_with_description"
+										}
+								},
+							["Manatee.Json.Tests.Test_References.Object.SchemaGenerationSimpleTarget"] = new JsonSchema07
+								{
+									Properties = new Dictionary<string, IJsonSchema>
+										{
+											["Integer"] = new JsonSchema07 { Type = JsonSchemaType.Integer},
+											["String"] = new JsonSchema07 { Type = JsonSchemaType.String},
 										}
 								}
 						},
@@ -51,8 +68,8 @@ namespace Manatee.Json.Tests.Schema
 								{
 									Type = JsonSchemaType.Boolean
 								},
-							["EnumProp"] = new JsonSchemaReference("#/Definitions/EnumSchemaValue", typeof(JsonSchema07)),
-							["FlagsEnumProp"] = new JsonSchemaReference("#/Definitions/EnumSchemaValue", typeof(JsonSchema07)),
+							["EnumProp"] = new JsonSchemaReference("#/Definitions/Manatee.Json.Tests.Test_References.Object.TestEnum", typeof(JsonSchema07)),
+							["FlagsEnumProp"] = new JsonSchemaReference("#/Definitions/Manatee.Json.Tests.Test_References.Object.FlagsEnum", typeof(JsonSchema07)),
 							["MappedProp"] = new JsonSchema07
 								{
 									Type = JsonSchemaType.Integer
@@ -91,11 +108,22 @@ namespace Manatee.Json.Tests.Schema
 								{
 									Type = JsonSchemaType.String,
 									Format = StringFormat.Uri
-								}
+								},
+							["Recurse"] = JsonSchema07.Root,
+							["Simple"] = new JsonSchemaReference("#/definitions/Manatee.Json.Tests.Test_References.Object.SchemaGenerationSimpleTarget", typeof(JsonSchema07))
+						}
+				};
+			var serializer = new JsonSerializer
+				{
+					Options =
+						{
+							EnumSerializationFormat = EnumSerializationFormat.AsName
 						}
 				};
 
-			var actual = JsonSchema07.GenerateFor<SchemaGenerationTarget>(new JsonSerializer());
+			var actual = JsonSchema07.GenerateFor<SchemaGenerationTarget>(serializer);
+
+			Console.WriteLine(actual.ToJson(serializer));
 
 			Assert.AreEqual(expected, actual);
 		}
@@ -126,7 +154,13 @@ namespace Manatee.Json.Tests.Schema
 							14
 						},
 					StringProp = "1234567890123",
-					Website = "http://site.com"
+					Website = "http://site.com",
+					Recurse = new SchemaGenerationTarget(),
+					Simple = new SchemaGenerationSimpleTarget
+						{
+							Integer = 4,
+							String = "string"
+						}
 				};
 			var serializer = new JsonSerializer
 				{
@@ -140,7 +174,7 @@ namespace Manatee.Json.Tests.Schema
 
 			var results = schema.Validate(json);
 
-			Console.WriteLine(schema.ToJson(new JsonSerializer()).ToString());
+			Console.WriteLine(schema.ToJson(new JsonSerializer()));
 			Console.WriteLine();
 			foreach (var schemaValidationError in results.Errors)
 			{
