@@ -12,6 +12,7 @@ namespace Manatee.Json.Schema.Generation
 {
 	internal class SchemaGenerator
 	{
+		private static readonly Dictionary<Type, JsonSchema07> _rawSchemas = new Dictionary<Type, JsonSchema07>();
 		private bool _generateProperties = true;
 
 		public JsonSchema07 Generate<T>(JsonSerializer serializer)
@@ -21,11 +22,13 @@ namespace Manatee.Json.Schema.Generation
 
 		public JsonSchema07 Generate(Type type, JsonSerializer serializer)
 		{
+			if (_rawSchemas.TryGetValue(type, out var schema)) return schema;
+
 			var properties = ReflectionCache.GetMembers(type, PropertySelectionStrategy.ReadWriteOnly, false)
 			                                .Select(s => s.MemberInfo)
 			                                .OfType<PropertyInfo>()
 			                                .ToList();
-			var schema = new JsonSchema07();
+			schema = new JsonSchema07();
 			_AssignType(schema, type, serializer);
 			var schemaProperties = new Dictionary<string, IJsonSchema>();
 			var required = new List<string>();
@@ -127,7 +130,7 @@ namespace Manatee.Json.Schema.Generation
 				                  .ToList();
 				serializer.Options.EncodeDefaultValues = defaultOption;
 			}
-			else schema.Type = JsonSchemaType.Object;
+			else schema.Type = JsonSchemaType.Object | JsonSchemaType.Null;
 		}
 	}
 }

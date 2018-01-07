@@ -49,6 +49,13 @@ namespace Manatee.Json.Tests
 			Assert.IsTrue(json.Equals(boolean));
 		}
 		[Test]
+		public void Equals_BooleanValueAsObject_ReturnsTrue()
+		{
+			var json = new JsonValue(true);
+			var boolean = true;
+			Assert.IsTrue(json.Equals((object)boolean));
+		}
+		[Test]
 		public void Equals_BooleanValue_ReturnsFalse()
 		{
 			var json = new JsonValue(true);
