@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Manatee.Study
 {
 	[TestFixture]
-	//[Ignore("This test suite is for development purposes only.")]
+	//[Ignore("This test suite is for development research purposes only.")]
 	public class NewtonsoftCaseStudy
 	{
 		private class MyClass
@@ -43,9 +43,33 @@ namespace Manatee.Study
 				};
 
 			var jobject = JObject.FromObject(target); // This is a Newtonsoft Json object
+
 			var asDictionary = jobject.ToObject<Dictionary<string, JsonValue>>();
 			var jsonValue = new JsonObject(asDictionary);
 
+			Console.WriteLine(jobject);
+			Console.WriteLine(jsonValue);
+		}
+
+		[Test]
+		public void Conversions2()
+		{
+			var target = new
+				{
+					LongProp = 500,
+					stringProp = "hello",
+					NestedProp = new
+						{
+							Culture = "en-nz"
+						}
+				};
+
+			var jobject = JObject.FromObject(target); // This is a Newtonsoft Json object
+
+			var asString = jobject.ToString();
+			var jsonValue = JsonValue.Parse(asString);
+
+			Console.WriteLine(jobject);
 			Console.WriteLine(jsonValue);
 		}
 	}
