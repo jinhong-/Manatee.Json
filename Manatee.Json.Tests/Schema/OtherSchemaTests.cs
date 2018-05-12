@@ -7,6 +7,7 @@ namespace Manatee.Json.Tests.Schema
 	public class OtherSchemaTests
 	{
 		[Test]
+		[Ignore("Not certain the expected result of this test.")]
 		public void LocationIndependentReferences()
 		{
 			JsonSchemaFactory.SetDefaultSchemaVersion<JsonSchema07>();
