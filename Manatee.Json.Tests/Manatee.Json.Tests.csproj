@@ -104,6 +104,7 @@
     <Compile Include="Schema\ConstSchemaTests.cs" />
     <Compile Include="Schema\ExamplesSchemaTest.cs" />
     <Compile Include="Schema\JsonSchemaTypeTest.cs" />
+    <Compile Include="Schema\OtherSchemaTests.cs" />
     <Compile Include="Schema\SchemaExtensionsTests.cs" />
     <Compile Include="Schema\SchemaValidationResultsExtensions.cs" />
     <Compile Include="Schema\SelfValidationTest.cs" />
@@ -137,6 +138,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Files\Issue58RefCore.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Files\Location-independent-schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Files\refSchema.json">

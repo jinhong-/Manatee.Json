@@ -1,0 +1,28 @@
+﻿{
+  "$id": "http://example.com/root.json",
+  "definitions": {
+    "A": {
+      "$id": "#foo"
+    },
+    "B": {
+      "$id": "other.json",
+      "definitions": {
+        "X": {
+          "$id": "#bar",
+          "allOf": [ false ]
+        },
+        "Y": {
+          "$id": "t/inner.json"
+        }
+      }
+    },
+    "C": {
+      "$ref": "http://example.com/other.json#bar"
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "http://example.com/root.json#/definitions/C"
+    }
+  ]
+}

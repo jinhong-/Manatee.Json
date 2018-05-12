@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Runtime.InteropServices;
 #if !NET45
 using System.Net.Http;
 #endif
+using Manatee.Json.Internal;
 
 namespace Manatee.Json.Schema
 {
@@ -56,11 +58,23 @@ namespace Manatee.Json.Schema
 					return new HttpClient().GetStringAsync(uri).Result;
 #endif
 				case "file":
-					var filename = Uri.UnescapeDataString(uri.AbsolutePath);
+					var filename = Uri.UnescapeDataString(uri.AbsolutePath)._AdjustForOs();
 					return File.ReadAllText(filename);
 				default:
 					throw new Exception();
 			}
+		}
+
+		private static string _AdjustForOs(this string path)
+		{
+#if NET45
+			return Environment.OSVersion.Platform.In(PlatformID.MacOSX, PlatformID.Unix)
+#else
+			return RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ||
+			       RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+#endif
+				       ? path.Replace("\\", "/")
+				       : path.Replace("/", "\\");
 		}
 	}
 }
