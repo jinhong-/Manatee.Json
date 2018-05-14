@@ -28,7 +28,8 @@ namespace Manatee.Json.Tests.Schema
                                     Minimum = 9000
                                 }
                             }
-                        }
+                        },
+                        Required = new[] { "power" }
                     },
                     Then = new JsonSchema07
                     {
@@ -40,7 +41,6 @@ namespace Manatee.Json.Tests.Schema
                     }
                 };
 
-                yield return new TestCaseData(objectSchema, new JsonValue(new JsonObject(new Dictionary<string, JsonValue> { }))).Returns(true);
                 yield return new TestCaseData(objectSchema, new JsonValue(new JsonObject(new Dictionary<string, JsonValue>
                 {
                     { "power", new JsonValue(10000) },
@@ -49,7 +49,7 @@ namespace Manatee.Json.Tests.Schema
                 yield return new TestCaseData(objectSchema, new JsonValue(new JsonObject(new Dictionary<string, JsonValue>
                 {
                     { "power", new JsonValue(1000) },
-                    { "disbelief", new JsonValue(true) }
+                    { "confidence", new JsonValue(true) }
                 }))).Returns(true);
 
                 yield return new TestCaseData(objectSchema, new JsonValue(new JsonObject(new Dictionary<string, JsonValue>
