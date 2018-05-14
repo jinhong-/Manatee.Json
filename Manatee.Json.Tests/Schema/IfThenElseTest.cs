@@ -114,7 +114,7 @@ namespace Manatee.Json.Tests.Schema
         [TestCaseSource(nameof(IfThenElseData))]
         public bool ValidateIfThenElse(IJsonSchema schema, JsonValue value)
         {
-            var result = schema.Validate(value, value);
+            var result = schema.Validate(value);
             return result.Valid;
         }
     }
