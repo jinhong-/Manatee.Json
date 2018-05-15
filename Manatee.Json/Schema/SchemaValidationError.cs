@@ -7,10 +7,14 @@ namespace Manatee.Json.Schema
 	/// </summary>
 	public class SchemaValidationError : IEquatable<SchemaValidationError>
 	{
-		/// <summary>
-		/// The property or property path which failed validation.
-		/// </summary>
-		public string PropertyName { get; private set; }
+        public IJsonSchema Schema { get; }
+        public string ValidationKeyword { get; }
+        public SchemaValidationError[] InnerErrors { get; }
+
+        /// <summary>
+        /// The property or property path which failed validation.
+        /// </summary>
+        public string PropertyName { get; private set; }
 		/// <summary>
 		/// A message indicating the failure.
 		/// </summary>
