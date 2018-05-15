@@ -16,11 +16,8 @@ namespace Manatee.Json.Schema
 		/// </summary>
 		public string Message { get; }
 
-        public IJsonSchema Schema { get; }
-
-        internal SchemaValidationError(IJsonSchema schema, string propertyName, string message)
+		internal SchemaValidationError(string propertyName, string message)
 		{
-            Schema = schema;
 			PropertyName = propertyName;
 			Message = message;
 		}

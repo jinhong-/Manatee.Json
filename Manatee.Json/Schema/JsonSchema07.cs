@@ -468,7 +468,7 @@ namespace Manatee.Json.Schema
 			if (BooleanSchemaDefinition == true)
 				return new SchemaValidationResults();
 			if (BooleanSchemaDefinition == false)
-				return new SchemaValidationResults(new[] {new SchemaValidationError(this, string.Empty, "All schemata are invalid")});
+				return new SchemaValidationResults(new[] {new SchemaValidationError(string.Empty, "All schemata are invalid")});
 
 			var jValue = root ?? ToJson(null);
 			var validators = JsonSchemaPropertyValidatorFactory.Get(this, json);

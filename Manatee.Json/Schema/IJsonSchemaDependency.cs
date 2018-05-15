@@ -16,7 +16,7 @@
 		/// <param name="json">A <see cref="JsonValue"/></param>
 		/// <param name="root">The root schema serialized to a <see cref="JsonValue"/>.  Used internally for resolving references.</param>
 		/// <returns>The results of the validation.</returns>
-		SchemaValidationResults Validate(IJsonSchema schema, JsonValue json, JsonValue root = null);
+		SchemaValidationResults Validate(JsonValue json, JsonValue root = null);
 		/// <summary>
 		/// Gets the JSON data to be used as the value portion in the dependency list of the schema.
 		/// </summary>

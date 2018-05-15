@@ -23,7 +23,7 @@ namespace Manatee.Json.Schema.Validators
 						["expected"] = contains,
 						["value"] = json
 				});
-				return new SchemaValidationResults(schema, string.Empty, message);
+				return new SchemaValidationResults(string.Empty, message);
 			}
 
 			var validations = json.Array.Select(jv => contains.Validate(jv, root)).ToList();
