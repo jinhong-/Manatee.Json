@@ -34,7 +34,7 @@ namespace Manatee.Json.Schema
 		/// <param name="json">A <see cref="JsonValue"/></param>
 		/// <param name="root">The root schema serialized to a <see cref="JsonValue"/>.  Used internally for resolving references.</param>
 		/// <returns>The results of the validation.</returns>
-		public SchemaValidationResults Validate(JsonValue json, JsonValue root = null)
+		public SchemaValidationResults Validate(IJsonSchema schema, JsonValue json, JsonValue root = null)
 		{
 			if (json.Type != JsonValueType.Object || !json.Object.ContainsKey(PropertyName))
 				return new SchemaValidationResults();

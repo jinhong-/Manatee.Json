@@ -19,7 +19,7 @@ namespace Manatee.Json.Schema.Validators
 					{
 						["value"] = json
 					});
-				errors.Add(new SchemaValidationError("definitions", message));
+				errors.Add(new SchemaValidationError(schema, "definitions", message));
 			}
 
 			var metaSchema = JsonSchemaFactory.GetMetaSchema(schema.GetType());

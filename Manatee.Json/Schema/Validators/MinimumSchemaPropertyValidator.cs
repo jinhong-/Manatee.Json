@@ -22,7 +22,7 @@ namespace Manatee.Json.Schema.Validators
 							["expected"] = typed.Minimum,
 							["value"] = json
 					});
-					return new SchemaValidationResults(string.Empty, message);
+					return new SchemaValidationResults(schema, string.Empty, message);
 				}
 			}
 			else
@@ -34,7 +34,7 @@ namespace Manatee.Json.Schema.Validators
 							["expected"] = typed.Minimum,
 							["value"] = json
 					});
-					return new SchemaValidationResults(string.Empty, message);
+					return new SchemaValidationResults(schema, string.Empty, message);
 				}
 			}
 			return new SchemaValidationResults();
@@ -64,7 +64,7 @@ namespace Manatee.Json.Schema.Validators
 						["expected"] = min,
 						["value"] = json
 				});
-				return new SchemaValidationResults(string.Empty, message);
+				return new SchemaValidationResults(schema, string.Empty, message);
 			}
 
 			return new SchemaValidationResults();
@@ -93,7 +93,7 @@ namespace Manatee.Json.Schema.Validators
 						["expected"] = min,
 						["value"] = json
 				});
-				return new SchemaValidationResults(string.Empty, message);
+				return new SchemaValidationResults(schema, string.Empty, message);
 			}
 
 			return new SchemaValidationResults();

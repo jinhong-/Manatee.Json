@@ -22,7 +22,7 @@ namespace Manatee.Json.Schema.Validators
 						["expected"] = constant,
 						["value"] = json
 					});
-				return new SchemaValidationResults(string.Empty, message);
+				return new SchemaValidationResults(schema, string.Empty, message);
 			}
 			return new SchemaValidationResults();
 		}
