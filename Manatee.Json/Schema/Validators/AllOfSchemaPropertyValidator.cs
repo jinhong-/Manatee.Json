@@ -15,7 +15,9 @@ namespace Manatee.Json.Schema.Validators
 
 		public SchemaValidationResults Validate(IJsonSchema schema, JsonValue json, JsonValue root)
 		{
-			return new SchemaValidationResults(GetAllOf((T) schema).Select(s => s.Validate(json, root)));
+            var innerErrors = GetAllOf((T)schema).Select(s => s.Validate(json, root)).SelectMany(r => r.Errors);
+            return new SchemaValidationResults(schema, string.Empty, string.Empty, validationKeyword: "allOf",
+                innerErrors: innerErrors);
 		}
 	}
 

@@ -23,9 +23,10 @@ namespace Manatee.Json.Schema
 		/// </summary>
 		/// <param name="propertyName">The name of the property that failed.</param>
 		/// <param name="message">A message explaining the error.</param>
-		public SchemaValidationResults(string propertyName, string message)
+		public SchemaValidationResults(IJsonSchema schema, string propertyName, string message,
+            string validationKeyword = null, IEnumerable<SchemaValidationError> innerErrors = null)
 		{
-			Errors = new[] {new SchemaValidationError(propertyName, message)};
+			Errors = new[] {new SchemaValidationError(schema, propertyName, message, validationKeyword, innerErrors) };
 		}
 		/// <summary>
 		/// Creates an instance of <see cref="SchemaValidationResults"/>.
