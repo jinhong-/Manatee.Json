@@ -22,7 +22,7 @@ namespace Manatee.Json.Schema.Validators
                         ["expected"] = typed.Maximum,
                         ["value"] = json,
                     });
-                    return new SchemaValidationResults(schema, string.Empty, message, validationKeyword: "exclusiveMaximum");
+                    return new SchemaValidationResults(schema, string.Empty, message, validationKeyword: "maximum");
                 }
             }
             else
@@ -64,8 +64,7 @@ namespace Manatee.Json.Schema.Validators
                     ["expected"] = max,
                     ["value"] = json
                 });
-                return new SchemaValidationResults(schema, string.Empty, message,
-                    validationKeyword: typed.ExclusiveMaximum.HasValue ? "exclusiveMaximum" : "maximum");
+                return new SchemaValidationResults(schema, string.Empty, message, "maximum");
             }
             return new SchemaValidationResults();
         }
@@ -93,8 +92,7 @@ namespace Manatee.Json.Schema.Validators
                     ["expected"] = max,
                     ["value"] = json
                 });
-                return new SchemaValidationResults(schema, string.Empty, message,
-                    validationKeyword: typed.ExclusiveMaximum.HasValue ? "exclusiveMaximum" : "maximum");
+                return new SchemaValidationResults(schema, string.Empty, message, "maximum");
             }
 
             return new SchemaValidationResults();

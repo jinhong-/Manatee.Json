@@ -132,7 +132,7 @@ namespace Manatee.Json.Schema.Validators
     {
         public override bool Applies(IJsonSchema schema, JsonValue json)
         {
-            return base.Applies(schema, json) || (schema is JsonSchema06 typed && json.Type == JsonValueType.Object && typed.PropertyNames != null);
+            return base.Applies(schema, json) || (schema is JsonSchema06 typed && json.Type == JsonValueType.Object);
         }
 
         protected override IDictionary<string, IJsonSchema> GetProperties(JsonSchema06 schema)

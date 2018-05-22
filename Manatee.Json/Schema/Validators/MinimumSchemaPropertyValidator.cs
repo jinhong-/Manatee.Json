@@ -22,7 +22,7 @@ namespace Manatee.Json.Schema.Validators
                         ["expected"] = typed.Minimum,
                         ["value"] = json
                     });
-                    return new SchemaValidationResults(schema, string.Empty, message, validationKeyword: "exclusiveMinimum");
+                    return new SchemaValidationResults(schema, string.Empty, message, validationKeyword: "minimum");
                 }
             }
             else
@@ -64,8 +64,7 @@ namespace Manatee.Json.Schema.Validators
                     ["expected"] = min,
                     ["value"] = json
                 });
-                return new SchemaValidationResults(schema, string.Empty, message,
-                    validationKeyword: typed.ExclusiveMinimum.HasValue ? "exclusiveMinimum" : "minimum");
+                return new SchemaValidationResults(schema, string.Empty, message, "minimum");
             }
 
             return new SchemaValidationResults();
@@ -94,8 +93,7 @@ namespace Manatee.Json.Schema.Validators
                     ["expected"] = min,
                     ["value"] = json
                 });
-                return new SchemaValidationResults(schema, string.Empty, message,
-                    validationKeyword: typed.ExclusiveMinimum.HasValue ? "exclusiveMinimum" : "minimum");
+                return new SchemaValidationResults(schema, string.Empty, message, "minimum");
             }
 
             return new SchemaValidationResults();
