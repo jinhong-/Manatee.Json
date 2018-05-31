@@ -31,13 +31,7 @@ namespace Manatee.Json.Schema.Validators
                 {
                     itemsErrors.AddRange(items[i].Validate(array[i], root).Errors);
                     i++;
-                }
-                if (itemsErrors.Any())
-                {
-                    errors.Add(new SchemaValidationError(schema, string.Empty, "", validationKeyword: "items", innerErrors: itemsErrors.ToArray()));
-                }
-
-                var additionalItemsErrors = new List<SchemaValidationError>();
+                }                                
                 if (i < array.Count && additionalItems != null)
                     if (Equals(additionalItems, AdditionalItems.False))
                     {
@@ -45,15 +39,14 @@ namespace Manatee.Json.Schema.Validators
                         {
                             ["value"] = json
                         });
-                        errors.Add(new SchemaValidationError(schema, string.Empty, message, validationKeyword: "additionalItems"));
+                        itemsErrors.Add(new SchemaValidationError(schema, string.Empty, message, validationKeyword: "items"));
                     }
                     else if (!Equals(additionalItems, AdditionalItems.True))
-                        additionalItemsErrors.AddRange(array.Skip(i).SelectMany(j => additionalItems.Definition.Validate(j, root).Errors));
+                        itemsErrors.AddRange(array.Skip(i).SelectMany(j => additionalItems.Definition.Validate(j, root).Errors));
 
-                if (additionalItemsErrors.Any())
+                if (itemsErrors.Any())
                 {
-                    errors.Add(new SchemaValidationError(schema, string.Empty, "", validationKeyword: "additionalItems",
-                        innerErrors: additionalItemsErrors.ToArray()));
+                    errors.Add(new SchemaValidationError(schema, string.Empty, "", validationKeyword: "items", innerErrors: itemsErrors.ToArray()));
                 }
             }
             else if (GetItems(typed) != null)
@@ -61,9 +54,12 @@ namespace Manatee.Json.Schema.Validators
                 // have single schema: validate all against this
                 var itemValidations = array.Select(v => GetItems(typed).Validate(v, root));
                 var innerErrors = itemValidations.SelectMany((v, i) => v.Errors.Select(e => e.PrependPropertyName($"[{i}]"))).ToArray();
-                errors.Add(new SchemaValidationError(schema, string.Empty, "", 
-                    validationKeyword: "items",
-                    innerErrors: innerErrors));
+                if (innerErrors.Any())
+                {
+                    errors.Add(new SchemaValidationError(schema, string.Empty, "",
+                        validationKeyword: "items",
+                        innerErrors: innerErrors));
+                }
             }
             return new SchemaValidationResults(errors);
         }
