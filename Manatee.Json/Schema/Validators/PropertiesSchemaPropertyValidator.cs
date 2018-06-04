@@ -70,8 +70,11 @@ namespace Manatee.Json.Schema.Validators
                     foreach (var match in matches)
                     {
                         var matchErrors = localSchema.Validate(extraData[match], root).Errors;
-                        errors.Add(new SchemaValidationError(schema, string.Empty, string.Empty, validationKeyword: "patternProperties",
-                            innerErrors: matchErrors.Select(e => new SchemaValidationError(localSchema, match, e.Message))));
+                        if (matchErrors.Any())
+                        {
+                            errors.Add(new SchemaValidationError(schema, string.Empty, string.Empty, validationKeyword: "patternProperties",
+                                innerErrors: matchErrors.Select(e => new SchemaValidationError(localSchema, match, e.Message))));
+                        }
                     }
                     propertiesToRemove.AddRange(extraData.Keys.Where(k => pattern.IsMatch(k)));
                 }
@@ -86,20 +89,15 @@ namespace Manatee.Json.Schema.Validators
             {
                 if (Equals(additionalProperties, AdditionalProperties.False) && extraData.Any())
                     errors.Add(new SchemaValidationError(schema, string.Empty, string.Empty, validationKeyword: "additionalProperties"));
-                //errors.AddRange(extraData.Keys.Select(k =>
-                //    {
-                //        var message = SchemaErrorMessages.AdditionalProperties_False.ResolveTokens(new Dictionary<string, object>
-                //        {
-                //            ["property"] = k,
-                //            ["value"] = json
-                //        });
-                //        return new SchemaValidationError(schema, k, message);
-                //    }));
                 else
                 {
                     var localSchema = additionalProperties.Definition;
-                    errors.Add(new SchemaValidationError(localSchema, "", "", validationKeyword: "additionalProperties",
-                        innerErrors: extraData.Keys.SelectMany(key => localSchema.Validate(extraData[key], root).Errors)));
+                    var innerErrors = extraData.Keys.SelectMany(key => localSchema.Validate(extraData[key], root).Errors).ToArray();
+                    if (innerErrors.Any())
+                    {
+                        errors.Add(new SchemaValidationError(localSchema, "", "", validationKeyword: "additionalProperties",
+                            innerErrors: innerErrors));
+                    }
                 }
             }
             var additionalValidation = AdditionValidation(typed, json, root);
